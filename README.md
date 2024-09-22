@@ -31,26 +31,33 @@ The scraped data will be saved in `out/combined_results.csv` in the following fo
    ```bash
    `git clone https://github.com/yourusername/your-repo-name.git`
 
-Navigate to the project directory:
-`cd your-repo-name`
+2. **Navigate to the project directory**:
+   ```bash
+   `cd your-repo-name`
 
-Create and activate a virtual environment:
-`python -m venv venv`
-# On Linux/mac `source venv/bin/activate`
-# On Windows use `venv\Scripts\activate`
+3. **Create and activate a virtual environment**:
+   ```bash
+   `python -m venv venv`
+   `source venv/bin/activate` On Windows use `venv\Scripts\activate`
 
-Install the required packages:
-`pip install -r requirements.txt`
+4. **Install the required packages**:
+   ```bash
+   `pip install -r requirements.txt`
 
-Run the main script:
-`python main.py`
+5. **Run the main script**:
+   ```bash
+   `python main.py`
 
 This will start the scraping process and save the results to out/combined_results.csv.
 
-
 ## Testing Mode
+
 You can run the scraper in test mode to limit the number of URLs processed:
-`main(test_mode=True, test_limit=5)`
+
+   `main(test_mode=True, test_limit=5)`
+
+This will scrape only the first 5 seat URLs for testing purposes.
+
 
 ## Contributing
 If you would like to contribute to this project, please fork the repository and submit a pull request. Feel free to report issues or suggest improvements.

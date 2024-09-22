@@ -33,7 +33,7 @@ def extract_district_and_seat(url):
     return district, seat
 
 # Function to scrape data from each seat's page
-def scrape_seat_data(seat_url):
+def scrape_seat_data(seat_url, cycle_number):
     start_time = time.time()
     try:
         response = requests.get(seat_url)
@@ -89,12 +89,9 @@ def scrape_seat_data(seat_url):
 
         overall_table = soup.select('table.select-table')[1] if len(soup.select('table.select-table')) > 1 else None
         if overall_table:
-            print(f"Found second table on {seat_url}")  # Confirm the table is found
             overall_rows = overall_table.find_all('tr')
-            print(f"Overall table rows found: {len(overall_rows)}")  # Check number of rows
             for row in overall_rows:
                 cols = row.find_all('td')
-                print(f"Row columns found: {len(cols)} | Content: {[col.text for col in cols]}")  # Print the columns found
                 if len(cols) >= 2:  # Adjusted condition to handle three columns, taking only the first two
                     key = cols[0].text.strip()
                     value = cols[1].text.strip().replace(',', '')
@@ -116,7 +113,7 @@ def scrape_seat_data(seat_url):
             data.update(overall_data)
 
         end_time = time.time()
-        print(f"Scraping successful for {seat_url} | Time taken: {end_time - start_time:.2f} seconds")
+        print(f"{cycle_number} Scraping successful for {seat_url} | Time taken: {end_time - start_time:.2f} seconds")
         return combined_data
     except Exception as e:
         end_time = time.time()
@@ -134,12 +131,17 @@ def main(test_mode=False, test_limit=5):
 
     # List to collect all combined data
     all_combined_data = []
+    
+    # Initialize cycle counter
+    cycle_number = 1
 
     # Scrape data for each seat
     for seat_url in seat_urls:
-        combined_data = scrape_seat_data(seat_url)
+        combined_data = scrape_seat_data(seat_url, cycle_number)
+        cycle_number += 1  # Increment the cycle counter
         all_combined_data.extend(combined_data)  # Append combined data for each seat
         time.sleep(2)  # Respectful delay to avoid overloading the server
+
 
     # Convert combined data into a DataFrame and save to CSV
     if all_combined_data:
@@ -153,4 +155,4 @@ def main(test_mode=False, test_limit=5):
 
 # Run the main function
 if __name__ == "__main__":
-    main(test_mode=False)  # Set the limit as needed for testing
+    main(test_mode=True)  # Set the limit as needed for testing

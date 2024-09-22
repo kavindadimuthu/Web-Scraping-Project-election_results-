@@ -65,18 +65,26 @@ def scrape_seat_data(seat_url):
                     combined_data.append({
                         'District': district,  # Add district column
                         'Seat': seat,  # Add seat column
-                        'Release Date': release_date,
-                        'Candidate Name': cols[0].text.strip(),
-                        'Party Abbreviation': cols[1].text.strip(),
-                        'Votes Received': int(cols[2].text.strip().replace(',', '')),
+                        'Release_date': release_date,
+                        'Candidate_name': cols[0].text.strip(),
+                        'Party_abbreviation': cols[1].text.strip(),
+                        'Votes_received': int(cols[2].text.strip().replace(',', '')),
                         'Percentage': float(cols[3].text.strip().replace('%', ''))
                     })
+
+        # Define a mapping for the overall data fields
+        overall_field_mapping = {
+            'Valid Votes': 'Valid_votes_in_seat',
+            'Rejected Votes': 'Rejected_votes_in_seat',
+            'Total Polled': 'Total_polled_in_seat',  # Add this line
+            'Total Electors': 'Total_electors_in_seat'  # Add this line
+        }
 
         # Scrape the second table for overall results
         overall_data = {
             'District': district,  # Add district column
             'Seat': seat,  # Add seat column
-            'Release Date': release_date
+            'Release_date': release_date
         }
 
         overall_table = soup.select('table.select-table')[1] if len(soup.select('table.select-table')) > 1 else None
@@ -91,12 +99,15 @@ def scrape_seat_data(seat_url):
                     key = cols[0].text.strip()
                     value = cols[1].text.strip().replace(',', '')
 
-                    # Attempt to convert the value to an integer if possible
+                    # Attempt to get the overall field value and handle possible conversion issues
                     try:
-                        overall_data[key] = int(value)
+                        if key in overall_field_mapping:
+                            overall_data[overall_field_mapping[key]] = int(value.replace(',', '')) if value.isdigit() else 0
+                        else:
+                            print(f"Warning: Key '{key}' not found in overall_field_mapping.")
                     except ValueError:
-                        print(f"Warning: Could not convert {value} to an integer.")
-                        overall_data[key] = 0
+                        print(f"Warning: Could not convert value '{value}' to an integer.")
+
         else:
             print(f"No second table found on {seat_url}")
 
@@ -133,7 +144,7 @@ def main(test_mode=False, test_limit=5):
     # Convert combined data into a DataFrame and save to CSV
     if all_combined_data:
         df_combined = pd.DataFrame(all_combined_data)
-        df_combined.to_csv('data/combined_results.csv', index=False)
+        df_combined.to_csv('out/sl_2024_presidential_election_results_dataset.csv', index=False)
         print("Combined data saved successfully.")
     else:
         print("No combined data collected.")
@@ -142,4 +153,4 @@ def main(test_mode=False, test_limit=5):
 
 # Run the main function
 if __name__ == "__main__":
-    main(test_mode=True, test_limit=5)  # Set the limit as needed for testing
+    main(test_mode=False)  # Set the limit as needed for testing
